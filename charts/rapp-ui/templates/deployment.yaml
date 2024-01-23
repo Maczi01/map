@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "rapp-ui.fullname" . }}
+  labels:
+    {{- include "rapp-ui.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "rapp-ui.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- if or .Values.podAnnotations .Values.checksum }}
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        {{- include "rapp-ui.checksum" . | indent 8 }}
+      {{- end }}
+      labels:
+        {{- include "rapp-ui.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with (include "rapp-ui.get-image-pull-secrets" .) }}
+      imagePullSecrets:
+        {{- range split "," . }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      serviceAccountName: {{ include "rapp-ui.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "rapp-ui.get-image-fullpath" (dict "global" .Values.global "local" .Values.image "imageName" "rapp-ui") }}
+          imagePullPolicy: {{ (index .Values.image "rapp-ui").pullPolicy }}
+          env:
+          - name: DEFAULT_PORT
+            value: {{ .Values.service.containerPort | quote }}
+          {{- if eq (include "rapp-ui.is-tls-enabled" .) "true" }}
+          - name: SSL_ENABLED
+            value: "true"
+          - name: SSL_CRT_FILE
+            value: "/app/ssl/rapp-ui/tls.crt"
+          - name: SSL_KEY_FILE
+            value: "/app/ssl/rapp-ui/tls.key"
+          {{- end }}
+          ports:
+          - name: http
+            containerPort: {{ .Values.service.containerPort }}
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "{{ .Values.service.livenessProbe.path }}"
+              port: {{ .Values.service.containerPort }}
+              scheme: {{ include "rapp-ui.service-protocol" . | upper }}
+            initialDelaySeconds: {{ .Values.service.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.service.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.service.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.service.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.service.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: "{{ .Values.service.readinessProbe.path }}"
+              port: {{ .Values.service.containerPort }}
+              scheme: {{ include "rapp-ui.service-protocol" . | upper }}
+            initialDelaySeconds: {{ .Values.service.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.service.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.service.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.service.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.service.readinessProbe.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - name: env-config-volume
+            mountPath: /tmp/app
+          {{- if .Values.global.tls.ca.secrets.internal.name }}
+          - name: internal-ca-volume
+            mountPath: /app/ssl/ca/internal-ca
+          {{- end }}
+          {{- range $i, $value := .Values.global.tls.ca.secrets.external }}
+          - name: {{ $value.name }}-{{ $i }}
+            mountPath: /app/ssl/ca/{{ $value.name }}-{{ $i }}
+          {{- end }}
+          {{- if eq (include "rapp-ui.is-tls-enabled" .) "true" }}
+          - name: tls-certs
+            mountPath: /app/ssl/rapp-ui
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: env-config-volume
+        configMap:
+          name: {{ include "rapp-ui.fullname" . }}-application-properties
+          defaultMode: 0777
+      {{- if .Values.global.tls.ca.secrets.internal.name }}
+      - name: internal-ca-volume
+        secret:
+          secretName:  {{ include "get-internal-ca-secret-fullname" . }}
+          items:
+          - key: {{ .Values.global.tls.ca.secrets.internal.key }}
+            path: {{ .Values.global.tls.ca.secrets.internal.key }}
+      {{- end }}
+      {{- range $i, $value := .Values.global.tls.ca.secrets.external }}
+      - name: {{ $value.name }}-{{ $i }}
+        secret:
+          secretName: {{ $value.name }}
+          items:
+            - key: {{ $value.key }}
+              path: {{ $value.key }}
+      {{- end }}
+      {{- if eq (include "rapp-ui.is-tls-enabled" .) "true" }}
+      - name: tls-certs
+        secret:
+          secretName: {{ include "rapp-ui.get-tls-certificate-secret-name" . }}
+      {{- end }}

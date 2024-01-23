@@ -1,0 +1,18 @@
+{{- if .Values.virtualHost.enabled }}
+{{- if eq (include "rapp-ui.is-tls-enabled" .) "true" }}
+{{- if .Capabilities.APIVersions.Has "cert-manager.io/v1/Certificate" }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  annotations:
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "rapp-ui.labels" . | nindent 4 }}
+    {{- include "rapp-ui.selectorLabels" . | nindent 4 }}
+  name:  {{ include "rapp-ui.fullname" . }}-internal-self-signed
+spec:
+  selfSigned: {}
+{{- end -}}
+{{- end -}}
+{{- end -}}

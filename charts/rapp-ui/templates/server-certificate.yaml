@@ -1,0 +1,30 @@
+{{- if eq (include "rapp-ui.is-tls-enabled" .) "true" }}
+{{- if .Capabilities.APIVersions.Has "cert-manager.io/v1/Certificate" }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "rapp-ui.get-tls-certificate-secret-name" . }}
+  labels:
+    {{- include "rapp-ui.labels" . | nindent 4 }}
+    {{- include "rapp-ui.selectorLabels" . | nindent 4 }}
+spec:
+  isCA: false
+  commonName: {{ include "rapp-ui.fullname" . }}
+  dnsNames:
+  - {{ include "rapp-ui.fullname" . }}
+  - {{ include "rapp-ui.fullname" . }}.{{ .Release.Namespace }}
+  - {{ include "rapp-ui.fullname" . }}.{{ .Release.Namespace }}.svc
+  - {{ include "rapp-ui.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  - localhost
+  secretName: {{ include "rapp-ui.get-tls-certificate-secret-name" . }}
+  privateKey:
+    algorithm: RSA
+    size: 2048
+  duration: 87600h
+  renewBefore: 48h
+  issuerRef:
+    name: {{ include "get-internal-ca-fullname" . }}
+    kind: Issuer
+    group: cert-manager.io
+{{- end }}
+{{- end }}

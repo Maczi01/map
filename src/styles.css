@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+.mapboxgl-ctrl-geocoder--icon-search {
+    left: 210px;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+    padding-left: 6px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 40px;
+    height: 40px;
+    border: 1px solid #cccccc;
+}
+
+.mapboxgl-ctrl-geocoder {
+    border-radius: 0;
+    width: 242px;
+}
+
+.mapboxgl-ctrl-geocoder--icon-close {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon {
+    top: 10px;
+}
+
+.mapboxgl-canary {
+    display: none;
+}
+
+.mapboxgl-ctrl-bottom-right {
+    display: none;
+}
+
+.mapboxgl-ctrl-bottom-left {
+    display: none;
+}
+
+.mapboxgl-ctrl-top-left {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder {
+    display: none;
+}
+
+.mapboxgl-ctrl-compass {
+    display: none !important;
+}
+
+.mapboxgl-ctrl-icon {
+    display: none;
+}
+
+.mapboxgl-ctrl-attrib {
+    display: none;
+}
+
+.mapboxgl-ctrl-logo {
+    display: none;
+}
+
+.mapboxgl-ctrl-compass {
+    display: none;
+}
+
+.mapboxgl-ctrl-zoom {
+    display: none;
+}
+
+.mapboxgl-ctrl-geolocate {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon-close {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon-loading {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon-pin {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon-marker {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon-clear {
+    display: none;
+}
+
+.mapboxgl-ctrl-geocoder--icon-chevron-up {
+    display: none;
+}
+
+.mapboxgl-popup-tip {
+    display: none;
+}
+
+.mapboxgl-popup-content {
+    padding: 0 !important ;
+    background-color: transparent !important;
+    transform: translate(-22px, -22px) !important;
+}
+
+.mapboxgl-popup-close-button {
+    position: absolute;
+    right: -43px !important;
+    top: 8px !important;
+}
+
+.marker-popup-qos .mapboxgl-popup-close-button {
+    position: absolute;
+    right: -90px !important;
+    top: 8px !important;
+}
+.marker-popup-qos .mapboxgl-popup-content {
+    padding: 0 !important ;
+    background-color: transparent !important;
+    transform: translate(-52px, -22px) !important;
+}
+
+
+

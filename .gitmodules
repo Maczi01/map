@@ -1,0 +1,4 @@
+[submodule "ci/scripts"]
+	path = ci/scripts
+	url = git@github.com:neueda/mvt-ci.git
+	branch = main
